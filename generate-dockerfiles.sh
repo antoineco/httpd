@@ -9,10 +9,9 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
-nghttp2VersionDebian="$(docker run -i --rm debian:stretch-slim bash -c 'apt-get update -qq && apt-cache show "$@"' -- "libnghttp2-dev" |tac|tac| awk -F ': ' '$1 == "Version" { print $2; exit }')"
-opensslVersionDebian="$(docker run -i --rm debian:jessie-backports bash -c 'apt-get update -qq && apt-cache show "$@"' -- "openssl" |tac|tac| awk -F ': ' '$1 == "Version" { print $2; exit }')"
+nghttp2VersionDebian="$(docker run -i --rm centos:7 bash -c 'yum install -y https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm && yum info "$@"' -- 'nghttp2' |tac|tac| awk -F ': ' '$1 ~ /^Version/ { print $2; exit }')"
+opensslVersionDebian="$(docker run -i --rm centos:7 bash -c 'yum install -y https://downloads.ulyaoth.net/rpm/ulyaoth-latest.centos.noarch.rpm && yum info "$@"' -- 'ulyaoth-openssl1.0.2' |tac|tac| awk -F ': ' '$1 ~ /^Version/ { print $2; exit }')"
 
-travisEnv=
 for version in "${versions[@]}"; do
 	fullVersion="$(curl -sSL --compressed "https://www.apache.org/dist/httpd/" | grep -E '<a href="httpd-'"$version"'[^"-]+.tar.bz2"' | sed -r 's!.*<a href="httpd-([^"-]+).tar.bz2".*!\1!' | sort -V | tail -1)"
 	sha1="$(curl -fsSL "https://www.apache.org/dist/httpd/httpd-$fullVersion.tar.bz2.sha1" | cut -d' ' -f1)"
@@ -23,14 +22,7 @@ for version in "${versions[@]}"; do
 			-e 's/^(ENV HTTPD_SHA1) .*/\1 '"$sha1"'/' \
 			-e 's/^(ENV NGHTTP2_VERSION) .*/\1 '"$nghttp2VersionDebian"'/' \
 			-e 's/^(ENV OPENSSL_VERSION) .*/\1 '"$opensslVersionDebian"'/' \
-			"$version/Dockerfile" "$version"/*/Dockerfile
+			"$version"/*/Dockerfile
 	)
 
-	for variant in alpine; do
-		travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
-	done
-	travisEnv='\n  - VERSION='"$version$travisEnv"
 done
-
-travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
-echo "$travis" > .travis.yml

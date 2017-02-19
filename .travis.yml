@@ -1,25 +1,34 @@
-language: bash
-services: docker
+language: go
+
+go:
+- 1.7.x
+
+sudo: required
+
+services:
+- docker
 
 env:
-  - VERSION=2.4
-  - VERSION=2.4 VARIANT=alpine
-  - VERSION=2.2
-  - VERSION=2.2 VARIANT=alpine
+  global:
+  - secure: ejXe0sLjKYlxHuJmFe0KVJhFvHXt7JMcGzWJaWaPItlxpC+Y8gfKH2Jdx3irTf09sklLWTMiXy6f75neRs7YhsK/PihnN9iWgmzKrZOQd+ivI9urdxsvMpw88qOaD5b/j+oBPbP0CeNDEf7SyfvPdlKnEfXqLR+Ql8KJeCiGRdcm17kRZsd28B+4hcVXh8wXyMWJmR5fTUGkYEQ9okfxptmOimIS2we4ittX0WZ0rk2Sc51ZqsqPNEPSQV2KId2H599MddOemzPyl1kyWCfVtPtzjV3HQbd5jv7sBxI5E5ygxR0iQzMMpvM3Z0OJkYewXlqh7lzUO4yqpGoNiR9v3JAAZd9UDUyOHA3M5SRzw9Kmw1pHsMFI2/adLpVySzJXMOlJ6RV5vJXDW4nAJ3GW5a4M39U5fMIK4/HcJMqW2/YGo2W7MqkQL4xL4BPQS53A0KkOEEDNGdyB5EVOMi6kwZGL4nT+cFhAl9gXmmtgdJqBSmdtHi1qaea4fq4tuNgoYjo49hx2PRLcJDTTrwO4L4yPjs+aeydEGRVYLw93SKmXya7ElIDRavAH7PEFwMcYYiyXe9R7x3rcIIrkFBpgJsMlvbK0Jdgowf/4dPTbRrxyHjjeBx8wE3oHQeItlv1z9SCaAIjxsORlsQggaqVtNLyCKtDxlLP7FAXQFYpXa74=
+  - secure: TOkqjjgevJn3/yvfJrm6WW+qlafwSTq1p4ExJl6isFSUVh3BKDANPchdZFYvKqMi33nTcXjmFEtcZ3a+2MX/yBHTBn0DcWt3IMGDAaTgcCGIvs54toeP98Hmngp9LAHhpz6oebpBwg5YLF4UnQdhPSszb3yspWaowcR5yENPTcQuZhucIJcBZ30oceq+RPubRxi2sIvZHiv7EW4jP/SrJb8rrEzV22ECsS+yuCRJutIoyG3+9L1IpZ4RXc3jkFO+MPZ0X6BvTqwGpY1Ei3p+Avyrr5F94QywdFdxAxp5NFw6uFxdeVB02w66NDilr2S9I+gGhf5zhrq2GKzDwV03Dy2fHw3fOB4da5wrHEQDbIf+LdiFaWdtW77Zru4/JsZJ1w706JPoPth/+OHuR+p6dZWQZAjN8PcIDXTBJPkMvSEfs/zb6PrAlqr7Ce2MhujWBLtxK+2RXoqFy19DDLluUQ8CSpeNvxjqscTuPFSyKiC8JJWIajifSxksCl4XjrVmBnrVlC6UJRSLlRyRroJJ0VuaVgQf35GBso+kjSDdoAnCwGlw0gwPpfgdkqotK+99ipklX6hScRDfz5V3I2zbqt9kbLkXZkQZutREIOZqOCkZhP1OR4MpUgrIv4ioDxqIUmvyjmYVmJME9hVWJ4fvSeuLcawSzoeEWn8OjMHDJwc=
 
 install:
-  - git clone https://github.com/docker-library/official-images.git ~/official-images
-
-before_script:
-  - env | sort
-  - cd "$VERSION/$VARIANT"
-  - image="httpd:${VERSION}${VARIANT:+-$VARIANT}"
+  # build Bashbrew
+- |
+    go get github.com/constabulary/gb/...
+    (
+        cd /tmp
+        git clone --depth 1 https://github.com/docker-library/official-images.git
+        cd official-images/bashbrew/go
+        gb build
+        mv bin/bashbrew "$GOPATH"/bin
+    )
 
 script:
-  - docker build -t "$image" .
-  - ~/official-images/test/run.sh "$image"
+- repo="${PWD##*/}"
+- bashbrew --library . build "$repo" --namespace "$DOCKER_HUB_USERNAME"
 
-after_script:
-  - docker images
-
-# vim:set et ts=2 sw=2:
+after_success:
+- docker login -u "$DOCKER_HUB_USERNAME" -p "$DOCKER_HUB_PASSWORD"
+- bashbrew --library . push "$repo" --namespace "$DOCKER_HUB_USERNAME"

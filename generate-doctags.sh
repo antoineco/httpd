@@ -33,52 +33,32 @@ dirCommit() {
 	)
 }
 
-cat <<-EOH
-# this file is generated via https://github.com/docker-library/httpd/blob/$(fileCommit "$self")/$self
-
-Maintainers: Tianon Gravi <admwiggin@gmail.com> (@tianon),
-             Joseph Ferguson <yosifkit@gmail.com> (@yosifkit)
-GitRepo: https://github.com/docker-library/httpd.git
-EOH
-
 # prints "$2$1$3$1...$N"
 join() {
 	local sep="$1"; shift
-	local out; printf -v out "${sep//%/%%}%s" "$@"
+	local out; printf -v out "${sep//%/%%}\`%s\`" "$@"
 	echo "${out#$sep}"
 }
 
 for version in "${versions[@]}"; do
-	commit="$(dirCommit "$version")"
-
-	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "HTTPD_VERSION" { print $3; exit }')"
-
-	versionAliases=(
-		$fullVersion
-		$version
-		${aliases[$version]:-}
-	)
-
-	echo
-	cat <<-EOE
-		Tags: $(join ', ' "${versionAliases[@]}")
-		GitCommit: $commit
-		Directory: $version
-	EOE
-
-	for variant in alpine; do
+	for variant in centos; do
 		[ -f "$version/$variant/Dockerfile" ] || continue
 
 		commit="$(dirCommit "$version/$variant")"
 
+		fullVersion="$(git show "$commit":"$version/$variant/Dockerfile" | awk '$1 == "ENV" && $2 == "HTTPD_VERSION" { print $3; exit }')"
+
+		versionAliases=(
+			$fullVersion
+			$version
+			${aliases[$version]:-}
+		)
+
 		variantAliases=( "${versionAliases[@]/%/-$variant}" )
 		variantAliases=( "${variantAliases[@]//latest-/}" )
 
-		echo
 		cat <<-EOE
-			Tags: $(join ', ' "${variantAliases[@]}")
-			GitCommit: $commit
-			Directory: $version/$variant
+		* $(join ', ' "${variantAliases[@]}") [($version/$variant/Dockerfile)](https://github.com/antoineco/httpd/blob/$commit/$version/$variant/Dockerfile)
 		EOE
 	done
 done
