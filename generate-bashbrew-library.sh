@@ -35,7 +35,7 @@ dirCommit() {
 
 cat <<-EOH
 Maintainers: Antoine Cotten <tonio.cotten@gmail.com> (@antoineco)
-GitRepo: https://github.com/antoineco/tomcat.git
+GitRepo: https://github.com/antoineco/httpd.git
 EOH
 
 # prints "$2$1$3$1...$N"
