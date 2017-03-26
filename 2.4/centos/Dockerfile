@@ -8,7 +8,7 @@ RUN set -x \
 # https://git.centos.org/blob/rpms!!httpd/92bb46ca7c37ce73ddd26da323d0f24258980da8/SPECS!httpd.spec#L576
 
 ENV HTTPD_PREFIX /usr/local/apache2
-ENV PATH $HTTPD_PREFIX/bin:/usr/local/ulyaoth/ssl/openssl1.0.2/bin:$PATH
+ENV PATH $HTTPD_PREFIX/bin:/usr/local/ulyaoth/openssl1.0.2/bin:$PATH
 RUN mkdir -p "$HTTPD_PREFIX" \
 	&& chown www-data:www-data "$HTTPD_PREFIX"
 WORKDIR $HTTPD_PREFIX
@@ -20,9 +20,11 @@ ENV OPENSSL_VERSION 1.0.2k
 
 # install httpd runtime dependencies
 # https://httpd.apache.org/docs/2.4/install.html#requirements
-RUN yum install -y https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm \
-# disable EPEL repo by default
-	&& yum-config-manager --disable epel \
+RUN yum install -y \
+	https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm \
+	https://downloads.ulyaoth.net/rpm/ulyaoth-latest.centos.x86_64.rpm \
+# disable EPEL and Ulyaoth repos by default
+	&& yum-config-manager --disable epel ulyaoth \
 	&& yum install -y \
 		apr \
 		apr-util \
@@ -35,8 +37,10 @@ RUN yum install -y https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release
 		pcre \
 		zlib \
 	&& yum install -y --enablerepo epel \
-		nghttp2-$NGHTTP2_VERSION \
-	&& yum clean all --enablerepo epel
+		libnghttp2-$NGHTTP2_VERSION \
+	&& yum install -y --enablerepo ulyaoth \
+		ulyaoth-openssl1.0.2-libs-$OPENSSL_VERSION \
+	&& yum clean all --enablerepo=epel,ulyaoth
 
 ENV HTTPD_VERSION 2.4.25
 ENV HTTPD_SHA1 bd6d138c31c109297da2346c6e7b93b9283993d2
@@ -49,11 +53,6 @@ ENV HTTPD_ASC_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 # see https://httpd.apache.org/docs/2.4/install.html#requirements
 #     https://git.centos.org/blob/rpms!!httpd/92bb46ca7c37ce73ddd26da323d0f24258980da8/SPECS!httpd.spec#L143
 RUN set -x \
-	&& yum install -y https://downloads.ulyaoth.net/rpm/ulyaoth-latest.centos.noarch.rpm \
-# disable Ulyaoth repo by default
-	&& yum-config-manager --disable ulyaoth \
-	&& yum install -y --enablerepo ulyaoth \
-		ulyaoth-openssl1.0.2-$OPENSSL_VERSION \
 	&& buildDeps=" \
 		bzip2 \
 		gcc \
@@ -69,9 +68,13 @@ RUN set -x \
 	&& buildDepsEpel=" \
 		libnghttp2-devel-$NGHTTP2_VERSION \
 	" \
+	&& buildDepsUlyaoth=" \
+		ulyaoth-openssl1.0.2-devel-$OPENSSL_VERSION \
+	" \
 	&& yum install -y $buildDeps \
 	&& yum install -y --enablerepo epel $buildDepsEpel \
-	&& yum clean all --enablerepo ulyaoth --enablerepo epel \
+	&& yum install -y --enablerepo ulyaoth $buildDepsUlyaoth \
+	&& yum clean all --enablerepo=epel,ulyaoth \
 	\
 	&& curl -sSLo httpd.tar.bz2 "$HTTPD_BZ2_URL" \
 	&& echo "$HTTPD_SHA1 *httpd.tar.bz2" | sha1sum -c - \
@@ -90,7 +93,7 @@ RUN set -x \
 	&& ./configure \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
-		--with-ssl=/usr/local/ulyaoth/ssl/openssl1.0.2 \
+		--with-ssl=/usr/local/ulyaoth/openssl1.0.2 \
 	&& make -j "$(nproc)" \
 	&& make install \
 	\
@@ -102,9 +105,8 @@ RUN set -x \
 		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
 		"$HTTPD_PREFIX/conf/httpd.conf" \
 	\
-	&& yum history -y rollback last-2 \
+	&& yum history -y rollback last-3 \
 	&& find /etc -mindepth 2 -name *.rpmsave -exec rm -v '{}' + \
-	&& rm -rf /usr/local/ulyaoth/ssl/openssl1.0.2/man /usr/local/ulyaoth/ssl/openssl1.0.2/include \
 	&& rm -rf /var/tmp/*
 
 COPY httpd-foreground /usr/local/bin/
