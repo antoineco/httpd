@@ -15,7 +15,7 @@ WORKDIR $HTTPD_PREFIX
 
 # library for mod_http2
 # mod_http2 requires a newer version of OpenSSL than centos:7 has available
-ENV NGHTTP2_VERSION 1.7.1
+ENV NGHTTP2_VERSION 1.21.1
 ENV OPENSSL_VERSION 1.0.2k
 
 # install httpd runtime dependencies
