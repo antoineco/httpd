@@ -42,8 +42,8 @@ RUN yum install -y \
 		ulyaoth-openssl1.0.2-libs-$OPENSSL_VERSION \
 	&& yum clean all --enablerepo=epel,ulyaoth
 
-ENV HTTPD_VERSION 2.4.26
-ENV HTTPD_SHA1 b10b0f569a0e5adfef61d8c7f0813d42046e399a
+ENV HTTPD_VERSION 2.4.27
+ENV HTTPD_SHA1 699e4e917e8fb5fd7d0ce7e009f8256ed02ec6fc
 
 # https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
 ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2
