@@ -1,10 +1,10 @@
 Maintainers: Antoine Cotten <tonio.cotten@gmail.com> (@antoineco)
 GitRepo: https://github.com/antoineco/httpd.git
 
-Tags: 2.2.32-centos, 2.2-centos
-GitCommit: 4bf31aaf10324a0b54eeee585cfa16d602f12d37
+Tags: 2.2.34-centos, 2.2-centos
+GitCommit: 94751d53f2a8025cce4e7c0eb1074b8ac11224ea
 Directory: 2.2/centos
 
 Tags: 2.4.27-centos, 2.4-centos, 2-centos, centos
-GitCommit: 5f118a849f8af6261f9e5a5887f1460e78971022
+GitCommit: f04b3129609bfc2a11f32ffb82be57b3eae2e422
 Directory: 2.4/centos
