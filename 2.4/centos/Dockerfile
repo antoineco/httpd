@@ -21,7 +21,7 @@ ENV OPENSSL_VERSION 1.0.2l
 # install httpd runtime dependencies
 # https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN yum install -y \
-	https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm \
+	https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-10.noarch.rpm \
 	https://downloads.ulyaoth.net/rpm/ulyaoth-latest.centos.x86_64.rpm \
 # disable EPEL and Ulyaoth repos by default
 	&& yum-config-manager --disable epel ulyaoth \
