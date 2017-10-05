@@ -5,6 +5,6 @@ Tags: 2.2.34-centos, 2.2-centos
 GitCommit: 94751d53f2a8025cce4e7c0eb1074b8ac11224ea
 Directory: 2.2/centos
 
-Tags: 2.4.27-centos, 2.4-centos, 2-centos, centos
-GitCommit: d74bde91302d75a3c6bb67c61466372b2ffabc4b
+Tags: 2.4.28-centos, 2.4-centos, 2-centos, centos
+GitCommit: 3ec8ceae80e402f462a7ad15be086d1e915978fe
 Directory: 2.4/centos
