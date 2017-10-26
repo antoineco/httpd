@@ -1,7 +1,7 @@
 # Supported tags and respective `Dockerfile` links
 
 * `2.2.34-centos`, `2.2-centos` [(2.2/centos/Dockerfile)](https://github.com/antoineco/httpd/blob/94751d53f2a8025cce4e7c0eb1074b8ac11224ea/2.2/centos/Dockerfile)
-* `2.4.28-centos`, `2.4-centos`, `2-centos`, `centos` [(2.4/centos/Dockerfile)](https://github.com/antoineco/httpd/blob/3ec8ceae80e402f462a7ad15be086d1e915978fe/2.4/centos/Dockerfile)
+* `2.4.29-centos`, `2.4-centos`, `2-centos`, `centos` [(2.4/centos/Dockerfile)](https://github.com/antoineco/httpd/blob/ce69d534398532f0cf1f9ea9c0ba1fdc16a0f1b3/2.4/centos/Dockerfile)
 
 ![logo](https://raw.githubusercontent.com/antoineco/httpd/master/logo.png)
 
