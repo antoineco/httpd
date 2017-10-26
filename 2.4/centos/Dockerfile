@@ -39,8 +39,8 @@ RUN yum install -y \
 		libnghttp2-$NGHTTP2_VERSION \
 	&& yum clean all --enablerepo=epel
 
-ENV HTTPD_VERSION 2.4.28
-ENV HTTPD_SHA1 0b37522b808dcee72e1d56d656b0def530b820a2
+ENV HTTPD_VERSION 2.4.29
+ENV HTTPD_SHA1 d99137fe45c6267653350f888bf745a3d242ddbe
 
 # https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
 ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2
