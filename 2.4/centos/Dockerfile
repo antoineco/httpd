@@ -21,7 +21,7 @@ ENV OPENSSL_VERSION 1.0.2k
 # install httpd runtime dependencies
 # https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN yum install -y \
-	https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-10.noarch.rpm \
+	https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
 # disable EPEL repo by default
 	&& yum-config-manager --disable epel \
 	&& yum install -y \

@@ -9,7 +9,7 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
-nghttp2VersionDebian="$(docker run -i --rm centos:7 bash -c 'yum install -y https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-10.noarch.rpm && yum info "$@"' -- 'nghttp2' |tac|tac| awk -F ': ' '$1 ~ /^Version/ { print $2; exit }')"
+nghttp2VersionDebian="$(docker run -i --rm centos:7 bash -c 'yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && yum info "$@"' -- 'nghttp2' |tac|tac| awk -F ': ' '$1 ~ /^Version/ { print $2; exit }')"
 opensslVersionDebian="$(docker run -i --rm centos:7 bash -c 'yum info "$@"' -- 'openssl' |tac|tac| awk -F ': ' '$1 ~ /^Version/ { print $2; exit }')"
 
 for version in "${versions[@]}"; do
